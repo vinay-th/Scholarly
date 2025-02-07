@@ -43,7 +43,7 @@ export default function ResultsPage() {
       try {
         console.log(data);
         const response = await fetch(
-          'http://localhost:3000/api/v1/find-scholarships',
+          'https://scholarly-sooty.vercel.app/api/v1/find-scholarships',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
