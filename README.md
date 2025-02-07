@@ -109,7 +109,7 @@ We welcome contributions! Follow these steps:
 4. Push to the branch: `git push origin feature-branch`
 5. Open a Pull Request.
 
-📌 [Contribution Guidelines](https://github.com/yourusername/scholarly/blob/main/CONTRIBUTING.md)
+📌 [Contribution Guidelines](https://github.com/vinay-th/Scholarly/blob/main/CONTRIBUTING.md)
 
 ---
 
