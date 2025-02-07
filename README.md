@@ -128,4 +128,8 @@ We welcome contributions! Follow these steps:
 
 ---
 
-Give **Scholarly** a ⭐ on GitHub and help more students find the scholarships they deserve!
+## Give **Scholarly** a ⭐ on GitHub and help more students find the scholarships they deserve!
+
+<div align="center">
+  <h3>Built with ❤️ by Vinay</h3>
+</div>
