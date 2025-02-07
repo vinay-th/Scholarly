@@ -1,48 +1,69 @@
 'use client';
-
 import { GraduationCap, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-// Sample data - in a real app, this would come from an API or database
-const scholarships = [
-  {
-    id: 1,
-    name: 'National Merit Scholarship',
-    provider: 'Department of Education',
-    minSSC: 85,
-    minHSC: 80,
-    minGrad: 75,
-    amount: 50000,
-    description: 'Merit-based scholarship for outstanding academic achievement',
-    deadline: '2024-12-31',
-    url: 'https://example.com/scholarship1',
-  },
-  {
-    id: 2,
-    name: 'Tech Innovation Grant',
-    provider: 'TechCorp Foundation',
-    minSSC: 70,
-    minHSC: 75,
-    minGrad: 80,
-    amount: 75000,
-    description: 'For students pursuing technology and innovation fields',
-    deadline: '2024-11-30',
-    url: 'https://example.com/scholarship2',
-  },
-  {
-    id: 3,
-    name: 'Future Leaders Program',
-    provider: 'Leadership Institute',
-    minSSC: 75,
-    minHSC: 75,
-    minGrad: 78,
-    amount: 100000,
-    description: "Supporting tomorrow's leaders in various fields",
-    deadline: '2024-10-15',
-    url: 'https://example.com/scholarship3',
-  },
-];
+interface Data {
+  name: string;
+  ssc_marks: number;
+  hsc_marks: number;
+  graduation_marks: number;
+  caste_category: string;
+}
+
+interface Scholarship {
+  id: number;
+  name: string;
+  provider: string;
+  minSSC: number;
+  minHSC: number;
+  minGrad: number;
+  amount: number;
+  description: string;
+  deadline: string;
+  url: string;
+}
 
 export default function ResultsPage() {
+  const [data, setData] = useState<Data | null>(null);
+  const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get data from sessionStorage safely
+    const storedData = sessionStorage.getItem('data');
+    if (storedData) {
+      setData(JSON.parse(storedData));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!data) return;
+
+    const fetchScholarships = async () => {
+      try {
+        console.log(data);
+        const response = await fetch(
+          'http://localhost:3000/api/v1/find-scholarships',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          }
+        );
+
+        if (!response.ok) throw new Error('Failed to fetch scholarships');
+        const result = await response.json();
+        setScholarships(result);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScholarships();
+  }, [data]);
+
   return (
     <div className="relative min-h-screen p-6 overflow-hidden">
       {/* Decorative elements */}
@@ -61,87 +82,93 @@ export default function ResultsPage() {
           </h1>
         </div>
 
-        <div className="neo-brutal-container p-8 overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="border-2 border-black bg-[#FFD700] p-3 text-left">
-                  Sr No
-                </th>
-                <th className="border-2 border-black bg-[#FF69B4] p-3 text-left">
-                  Scholarship Name
-                </th>
-                <th className="border-2 border-black bg-[#98FB98] p-3 text-left">
-                  Provider
-                </th>
-                <th className="border-2 border-black bg-[#87CEEB] p-3 text-left">
-                  Min SSC
-                </th>
-                <th className="border-2 border-black bg-white p-3 text-left">
-                  Min HSC
-                </th>
-                <th className="border-2 border-black bg-[#FFD700] p-3 text-left">
-                  Min Grad
-                </th>
-                <th className="border-2 border-black bg-[#FF3333] p-3 text-left text-white font-bold">
-                  Amount (₹)
-                </th>
-                <th className="border-2 border-black bg-[#98FB98] p-3 text-left">
-                  Description
-                </th>
-                <th className="border-2 border-black bg-[#87CEEB] p-3 text-left">
-                  Deadline
-                </th>
-                <th className="border-2 border-black bg-white p-3 text-left">
-                  Apply
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {scholarships.map((scholarship) => (
-                <tr key={scholarship.id} className="hover:bg-gray-50">
-                  <td className="border-2 border-black p-3">
-                    {scholarship.id}
-                  </td>
-                  <td className="border-2 border-black p-3 font-bold">
-                    {scholarship.name}
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    {scholarship.provider}
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    {scholarship.minSSC}%
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    {scholarship.minHSC}%
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    {scholarship.minGrad}%
-                  </td>
-                  <td className="border-2 border-black p-3 bg-[#FFEEEE] font-bold">
-                    {scholarship.amount.toLocaleString('en-IN')}
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    {scholarship.description}
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    {new Date(scholarship.deadline).toLocaleDateString('en-IN')}
-                  </td>
-                  <td className="border-2 border-black p-3">
-                    <a
-                      href={scholarship.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[#FF3333] hover:underline"
-                    >
-                      Apply <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </td>
+        {loading ? (
+          <p className="text-center text-lg">Loading scholarships...</p>
+        ) : scholarships.length === 0 ? (
+          <p className="text-center text-lg">No scholarships found.</p>
+        ) : (
+          <div className="neo-brutal-container p-8 overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="border-2 border-black bg-[#FFD700] p-3 text-left">
+                    Sr No
+                  </th>
+                  <th className="border-2 border-black bg-[#FF69B4] p-3 text-left">
+                    Scholarship Name
+                  </th>
+                  <th className="border-2 border-black bg-[#98FB98] p-3 text-left">
+                    Provider
+                  </th>
+                  <th className="border-2 border-black bg-[#87CEEB] p-3 text-left">
+                    Min SSC
+                  </th>
+                  <th className="border-2 border-black bg-white p-3 text-left">
+                    Min HSC
+                  </th>
+                  <th className="border-2 border-black bg-[#FFD700] p-3 text-left">
+                    Min Grad
+                  </th>
+                  <th className="border-2 border-black bg-[#FF3333] p-3 text-left text-white font-bold">
+                    Amount (₹)
+                  </th>
+                  <th className="border-2 border-black bg-[#98FB98] p-3 text-left">
+                    Description
+                  </th>
+                  <th className="border-2 border-black bg-[#87CEEB] p-3 text-left">
+                    Deadline
+                  </th>
+                  <th className="border-2 border-black bg-white p-3 text-left">
+                    Apply
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {scholarships.map((scholarship, index) => (
+                  <tr key={scholarship.id} className="hover:bg-gray-50">
+                    <td className="border-2 border-black p-3">{index + 1}</td>
+                    <td className="border-2 border-black p-3 font-bold">
+                      {scholarship.name}
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      {scholarship.provider}
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      {scholarship.minSSC}%
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      {scholarship.minHSC}%
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      {scholarship.minGrad}%
+                    </td>
+                    <td className="border-2 border-black p-3 bg-[#FFEEEE] font-bold">
+                      {scholarship.amount.toLocaleString('en-IN')}
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      {scholarship.description}
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      {new Date(scholarship.deadline).toLocaleDateString(
+                        'en-IN'
+                      )}
+                    </td>
+                    <td className="border-2 border-black p-3">
+                      <a
+                        href={scholarship.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[#FF3333] hover:underline"
+                      >
+                        Apply <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

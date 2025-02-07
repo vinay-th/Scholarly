@@ -25,11 +25,11 @@ import { GraduationCap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
-  stuName: z.string().min(1, 'Name is required'),
-  hscMarks: z.string().min(1, 'HSC marks are required'),
-  sscMarks: z.string().min(1, 'SSC marks are required'),
-  graduationMarks: z.string().min(1, 'Graduation marks are required'),
-  casteCategory: z.string().min(1, 'Caste category is required'),
+  name: z.string().min(1, 'Name is required'),
+  hsc_marks: z.number().min(1, 'HSC marks are required'),
+  ssc_marks: z.number().min(1, 'SSC marks are required'),
+  graduation_marks: z.number().min(1, 'Graduation marks are required'),
+  caste_category: z.string().min(1, 'Caste category is required'),
   otherDetails: z.string(),
 });
 
@@ -38,17 +38,25 @@ export default function ScholarshipForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      stuName: '',
-      hscMarks: '',
-      sscMarks: '',
-      graduationMarks: '',
-      casteCategory: '',
+      name: '',
+      hsc_marks: 0,
+      ssc_marks: 0,
+      graduation_marks: 0,
+      caste_category: '',
       otherDetails: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    // Parse the marks fields as numbers
+    const parsedValues = {
+      ...values,
+      hsc_marks: Number(values.hsc_marks),
+      ssc_marks: Number(values.ssc_marks),
+      graduation_marks: Number(values.graduation_marks),
+    };
+    console.log(parsedValues);
+    sessionStorage.setItem('data', JSON.stringify(parsedValues));
     router.push('/results');
   }
 
@@ -75,7 +83,7 @@ export default function ScholarshipForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="stuName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg font-bold bg-[#b16fe0] px-2 border-2 border-black inline-block">
@@ -96,7 +104,7 @@ export default function ScholarshipForm() {
 
               <FormField
                 control={form.control}
-                name="hscMarks"
+                name="hsc_marks"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg font-bold bg-[#FFD700] px-2 border-2 border-black inline-block">
@@ -108,6 +116,8 @@ export default function ScholarshipForm() {
                         placeholder="Enter your HSC marks"
                         className="neo-brutal-input"
                         {...field}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       />
                     </FormControl>
                     <FormMessage className="text-[#FF3333] font-medium" />
@@ -117,7 +127,7 @@ export default function ScholarshipForm() {
 
               <FormField
                 control={form.control}
-                name="sscMarks"
+                name="ssc_marks"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg font-bold bg-[#FF69B4] px-2 border-2 border-black inline-block">
@@ -129,6 +139,8 @@ export default function ScholarshipForm() {
                         placeholder="Enter your SSC marks"
                         className="neo-brutal-input"
                         {...field}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       />
                     </FormControl>
                     <FormMessage className="text-[#FF3333] font-medium" />
@@ -138,7 +150,7 @@ export default function ScholarshipForm() {
 
               <FormField
                 control={form.control}
-                name="graduationMarks"
+                name="graduation_marks"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg font-bold bg-[#98FB98] px-2 border-2 border-black inline-block">
@@ -150,6 +162,8 @@ export default function ScholarshipForm() {
                         placeholder="Enter your graduation marks"
                         className="neo-brutal-input"
                         {...field}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       />
                     </FormControl>
                     <FormMessage className="text-[#FF3333] font-medium" />
@@ -159,7 +173,7 @@ export default function ScholarshipForm() {
 
               <FormField
                 control={form.control}
-                name="casteCategory"
+                name="caste_category"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg font-bold bg-[#87CEEB] px-2 border-2 border-black inline-block">
@@ -175,10 +189,10 @@ export default function ScholarshipForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="obc">OBC</SelectItem>
-                        <SelectItem value="sc">SC</SelectItem>
-                        <SelectItem value="st">ST</SelectItem>
+                        <SelectItem value="General">General</SelectItem>
+                        <SelectItem value="OBC">OBC</SelectItem>
+                        <SelectItem value="SC">SC</SelectItem>
+                        <SelectItem value="ST">ST</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage className="text-[#FF3333] font-medium" />
