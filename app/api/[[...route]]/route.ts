@@ -30,6 +30,71 @@ app.get('v1/get-all-scholarships', async (c) => {
 });
 
 app.post(
+  'v1/add-scholarship',
+  zValidator(
+    'json',
+    z.object({
+      key: z.string(),
+      name: z.string(),
+      description: z.string(),
+      provider: z.string(),
+      amount: z.number(),
+      deadline: z.string().transform((str) => new Date(str)),
+      url: z.string(),
+      minSSC: z.number(),
+      minHSC: z.number(),
+      minGrad: z.number(),
+      casteCategory: z.enum(['General', 'OBC', 'SC', 'ST']),
+    })
+  ),
+  async (c) => {
+    const {
+      key,
+      name,
+      description,
+      provider,
+      amount,
+      deadline,
+      url,
+      minSSC,
+      minHSC,
+      minGrad,
+      casteCategory,
+    } = c.req.valid('json');
+
+    if (key.trim() !== process.env.SECRET_KEY?.trim()) {
+      return c.json({
+        message: 'Invalid key! Muh me lele laude!',
+      });
+    }
+
+    const scholarship = await db
+      .insert(scholarships)
+      .values({
+        name,
+        description,
+        provider,
+        amount,
+        deadline,
+        url,
+      })
+      .returning({ id: scholarships.id });
+
+    const eligibility = await db.insert(eligibility_criteria).values({
+      scholarship_id: scholarship[0].id,
+      min_ssc: minSSC,
+      min_hsc: minHSC,
+      min_graduation: minGrad,
+      caste_category: casteCategory,
+    });
+
+    return c.json({
+      message: 'Scholarship added successfully!',
+    });
+  }
+);
+
+app.post(
   'v1/find-scholarships',
   zValidator(
     'json',
