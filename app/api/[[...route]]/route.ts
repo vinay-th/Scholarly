@@ -4,7 +4,7 @@ import { cors } from 'hono/cors';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { db } from 'db/drizzle';
-import { scholarships, eligibility_criteria } from 'db/schema';
+import { scholarships, eligibility_criteria, applicants } from 'db/schema';
 
 export const runtime = 'edge';
 
@@ -149,6 +149,14 @@ app.post(
         url: scholarship.url,
         createdAt: scholarship.createdAt,
       };
+    });
+
+    const applicant = await db.insert(applicants).values({
+      name,
+      ssc_marks,
+      hsc_marks,
+      graduation_marks,
+      caste_category,
     });
 
     return c.json(scholarshipsList);
