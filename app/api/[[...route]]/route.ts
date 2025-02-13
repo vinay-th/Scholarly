@@ -121,7 +121,8 @@ app.post(
         ssc_marks >= scholarship.min_ssc &&
         hsc_marks >= scholarship.min_hsc &&
         graduation_marks >= scholarship.min_graduation &&
-        caste_category === scholarship.caste_category
+        (caste_category === scholarship.caste_category ||
+          scholarship.caste_category === 'ALL')
     );
 
     scholarshipsList = scholarshipsList.filter((scholarship) =>
